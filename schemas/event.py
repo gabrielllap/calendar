@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
-class Event(BaseModel):
+class EventCreate(BaseModel):
     title: str
-    location: str
+    description: str
     date: str
+    time: str
+    location: str
