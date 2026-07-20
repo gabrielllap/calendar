@@ -78,6 +78,30 @@ def get_events(
 
     return events
 
+@router.get("/events/filter")
+def filter_events(
+    date: str | None = None,
+    location: str | None = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    query = db.query(Event).filter(
+        Event.user_id == current_user.id
+    )
+
+    if date:
+        query = query.filter(
+            Event.date == date
+        )
+    if location:
+        query = query.filter(
+            Event.location == location
+        )
+
+    events = query.all()
+
+    return events
+
 @router.get(
     "/events/{event_id}",
     response_model=EventResponse
@@ -94,6 +118,7 @@ def get_event(
     )
 
     return event
+
 
 @router.put("/events/{event_id}")
 def update_event(
