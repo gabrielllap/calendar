@@ -31,9 +31,18 @@ Technologies Used
 
 Project Structure
 
-. ├── main.py ├── database.py ├── security.py ├── models/ │ ├── user.py
-│ └── event.py ├── routers/ │ ├── users.py │ └── events.py └── schemas/
-├── user.py └── event.py
+. ├── main.py
+├── database.py 
+├── security.py
+├── models/
+  │ ├── user.py
+  │ └── event.py 
+├── routers/
+  │ ├── users.py 
+  │ └── events.py 
+└── schemas/
+  ├── user.py
+  └── event.py
 
 Installation
 
@@ -49,9 +58,9 @@ passlib[bcrypt] python-multipart email-validator
 
 uvicorn main:app –reload
 
-API: http://127.0.0.1:8000
+API: http://127.0.0.1:8050
 
-Swagger Docs: http://127.0.0.1:8000/docs
+Swagger Docs: http://127.0.0.1:8050/docs
 
 Authentication
 
