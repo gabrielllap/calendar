@@ -159,6 +159,7 @@ def sort_events(
             detail="direction must be 'asc' or 'desc'"
         )
 
+
     return query.all()
 @router.get(
     "/events/{event_id}",
