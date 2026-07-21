@@ -12,6 +12,7 @@ from schemas.event import (
 )
 from security import get_current_user
 from sqlalchemy import or_
+from fastapi import HTTPException
 
 router = APIRouter()
 
@@ -122,6 +123,43 @@ def search_events(
 
     return events
 
+@router.get(
+    "/events/sort",
+    response_model=list[EventResponse]
+)
+def sort_events(
+    order_by: str = "date",
+    direction: str = "asc",
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if order_by == "date":
+        sort_column = Event.date
+    elif order_by == "title":
+        sort_column = Event.title
+    elif order_by == "location":
+        sort_column = Event.location
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="order_by must be 'date', 'title' or 'location'"
+        )
+
+    query = db.query(Event).filter(
+        Event.user_id == current_user.id
+    )
+
+    if direction == "asc":
+        query = query.order_by(sort_column.asc())
+    elif direction == "desc":
+        query = query.order_by(sort_column.desc())
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="direction must be 'asc' or 'desc'"
+        )
+
+    return query.all()
 @router.get(
     "/events/{event_id}",
     response_model=EventResponse
