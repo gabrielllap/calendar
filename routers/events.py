@@ -11,6 +11,7 @@ from schemas.event import (
     EventMessageResponse
 )
 from security import get_current_user
+from sqlalchemy import or_
 
 router = APIRouter()
 
@@ -99,6 +100,25 @@ def filter_events(
         )
 
     events = query.all()
+
+    return events
+
+@router.get(
+    "/events/search",
+    response_model=list[EventResponse]
+)
+def search_events(
+    keyword: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    events = db.query(Event).filter(
+        Event.user_id == current_user.id,
+        or_(
+            Event.title.ilike(f"%{keyword}%"),
+            Event.description.ilike(f"%{keyword}%")
+        )
+    ).all()
 
     return events
 
