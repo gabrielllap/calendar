@@ -12,7 +12,6 @@ from schemas.event import (
 )
 from security import get_current_user
 from sqlalchemy import or_
-from fastapi import HTTPException
 
 router = APIRouter()
 
@@ -41,7 +40,9 @@ def get_user_event(
 
 @router.post(
     "/events",
-    response_model=EventMessageResponse
+    response_model=EventMessageResponse,
+    summary="Create event",
+    description="Create a new event for the authenticated user."
 )
 def create_event(
     event: EventCreate,
@@ -68,7 +69,9 @@ def create_event(
 
 @router.get(
     "/events",
-    response_model=list[EventResponse]
+    response_model=list[EventResponse],
+    summary="List events",
+    description="Return all events belonging to the authenticated user."
 )
 def get_events(
     db: Session = Depends(get_db),
@@ -80,7 +83,12 @@ def get_events(
 
     return events
 
-@router.get("/events/filter")
+@router.get(
+    "/events/filter",
+    response_model=list[EventResponse],
+    summary="Filter events",
+    description="Filter events by date and/or location."
+)
 def filter_events(
     date: str | None = None,
     location: str | None = None,
@@ -106,7 +114,9 @@ def filter_events(
 
 @router.get(
     "/events/search",
-    response_model=list[EventResponse]
+    response_model=list[EventResponse],
+    summary="Search events",
+    description="Search events by keyword in the title or description."
 )
 def search_events(
     keyword: str,
@@ -125,7 +135,9 @@ def search_events(
 
 @router.get(
     "/events/sort",
-    response_model=list[EventResponse]
+    response_model=list[EventResponse],
+    summary="Sort events",
+    description="Sort events by date, title or location in ascending or descending order."
 )
 def sort_events(
     order_by: str = "date",
@@ -163,7 +175,9 @@ def sort_events(
     return query.all()
 @router.get(
     "/events/{event_id}",
-    response_model=EventResponse
+    response_model=EventResponse,
+    summary="Get event",
+    description="Return a single event by its ID."
 )
 def get_event(
     event_id: int,
@@ -179,7 +193,12 @@ def get_event(
     return event
 
 
-@router.put("/events/{event_id}")
+@router.put(
+    "/events/{event_id}",
+    response_model=EventMessageResponse,
+    summary="Update event",
+    description="Update an existing event owned by the authenticated user."
+)
 def update_event(
     event_id: int,
     event_data: EventUpdate,
@@ -205,7 +224,11 @@ def update_event(
         "message": "Event updated successfully",
         "event": event
     }
-@router.delete("/events/{event_id}")
+@router.delete(
+    "/events/{event_id}",
+    summary="Delete event",
+    description="Delete an event owned by the authenticated user."
+)
 def delete_event(
     event_id: int,
     db: Session = Depends(get_db),
