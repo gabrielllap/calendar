@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models.user import User
-from schemas.user import UserCreate
+from schemas.user import UserCreate,ChangePasswordRequest
 from security import (
     create_access_token,
     get_current_user,
@@ -95,4 +95,40 @@ def get_me(
         "id": current_user.id,
         "username": current_user.username,
         "email": current_user.email
+    }
+@router.put(
+    "/change-password",
+    summary="Change password",
+    description=(
+        "Change the password of the authenticated user "
+        "after validating the current password."
+    )
+)
+def change_password(
+    password_data: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if not verify_password(
+        password_data.old_password,
+        current_user.hashed_password
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Current password is incorrect"
+        )
+    if password_data.old_password == password_data.new_password:
+        raise HTTPException(
+            status_code=400,
+            detail="The new password must be different from the current password."
+        )
+
+    current_user.hashed_password = hash_password(
+        password_data.new_password
+    )
+
+    db.commit()
+
+    return {
+        "message": "Password changed successfully"
     }
